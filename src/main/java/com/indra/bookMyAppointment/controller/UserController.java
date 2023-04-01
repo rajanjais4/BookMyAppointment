@@ -1,8 +1,11 @@
 package com.indra.bookMyAppointment.controller;
 
+import com.indra.bookMyAppointment.auth.AuthenticationResponse;
 import com.indra.bookMyAppointment.model.user.User;
 import com.indra.bookMyAppointment.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -24,21 +27,26 @@ public class UserController {
         response.sendRedirect("/swagger-ui.html");
     }
     @GetMapping("/getAllUsers")
-    public List<User> getAllUsers()
+    public ResponseEntity<List<User>> getAllUsers()
     {
-        return userService.findAll();
+        return ResponseEntity.ok(userService.findAll());
     }
 
     @GetMapping("/getUserByPhoneNumber")
-    public User getUsersByPhoneNumber(@RequestParam("phoneNumber")String phoneNumber)
+    public ResponseEntity<User> getUsersByPhoneNumber(@RequestParam("phoneNumber")String phoneNumber)
     {
-        return userService.findUserByPhoneNumber(phoneNumber);
+        User user=userService.findUserByPhoneNumber(phoneNumber);
+//        if(user==null)
+//            throw new UsernameNotFoundException("User Not Found");
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/postNewUser")
-    public User createUser(@RequestBody User user){
+    public ResponseEntity<User> createUser(@RequestBody User user){
         User userResponse =userService.saveNewUser(user);
-        return userResponse;
+        if(user==null)
+            throw new UsernameNotFoundException("User not created");
+        return ResponseEntity.ok(userResponse);
     }
 
 }
