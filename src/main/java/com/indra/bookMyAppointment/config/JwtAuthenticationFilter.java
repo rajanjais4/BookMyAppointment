@@ -1,6 +1,7 @@
 package com.indra.bookMyAppointment.config;
 
 
+import com.indra.bookMyAppointment.exception.ApiRequestException;
 import com.indra.bookMyAppointment.token.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
@@ -34,15 +35,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   ) throws ServletException, IOException {
     final String authHeader = request.getHeader("Authorization");
     final String jwt;
-    final String userEmail;
+    final String userNumber;
     if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
       filterChain.doFilter(request, response);
+//      throw new ApiRequestException("Auth token not found");
       return;
     }
     jwt = authHeader.substring(7);
-    userEmail = jwtService.extractUsername(jwt);
-    if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-      UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+    userNumber = jwtService.extractUsername(jwt);
+    System.out.println("JwtAuthenticationFilter.doFilterInternal.userEmail - "+userNumber);
+    if (userNumber != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+      UserDetails userDetails = this.userDetailsService.loadUserByUsername(userNumber);
       var isTokenValid = tokenRepository.findByToken(jwt)
           .map(t -> !t.isExpired() && !t.isRevoked())
           .orElse(false);

@@ -16,7 +16,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-  @ApiIgnore
+
   @RequestMapping(value="/")
   public void redirect(HttpServletResponse response) throws IOException {
     response.sendRedirect("/swagger-ui.html");

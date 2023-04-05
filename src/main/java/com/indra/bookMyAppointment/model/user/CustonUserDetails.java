@@ -1,6 +1,5 @@
 package com.indra.bookMyAppointment.model.user;
 
-import com.indra.bookMyAppointment.model.common.Person;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

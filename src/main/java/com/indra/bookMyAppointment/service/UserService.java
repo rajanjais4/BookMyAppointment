@@ -1,16 +1,13 @@
 package com.indra.bookMyAppointment.service;
 
-import com.indra.bookMyAppointment.model.user.Role;
+import com.indra.bookMyAppointment.exception.ApiRequestException;
+import com.indra.bookMyAppointment.model.common.Person;
 import com.indra.bookMyAppointment.model.user.User;
 import com.indra.bookMyAppointment.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 @Service
 public class UserService {
@@ -25,7 +22,11 @@ public class UserService {
 
     public User findUserByPhoneNumber(String phoneNumber)
     {
-        User userResponse = userRepository.findByPhoneNumber(phoneNumber).orElseThrow();
+        User userResponse = userRepository.findByPhoneNumber(phoneNumber).orElse(null);
+        if(userResponse==null)
+            System.out.println("UserService.findUserByPhoneNumber - no user found - "+phoneNumber);
+        else
+            System.out.println("UserService.findUserByPhoneNumber user found - "+phoneNumber);
         return userResponse;
     }
 
@@ -33,31 +34,34 @@ public class UserService {
         System.out.println("user to save - "+user.getName());
         if(findUserByPhoneNumber(user.getPhoneNumber())!=null)
         {
-            System.out.println("Phone number already exists - "+user.getPhoneNumber());
-            return null;
+            String msg="Phone number already exists - "+user.getPhoneNumber();
+            System.out.println(msg);
+            throw new ApiRequestException(msg);
         }
         if(userRepository.findByEmail(user.getEmail())!=null)
         {
-            System.out.println("Email already exists - "+user.getEmail());
-            return null;
+            String msg="Email already exists - "+user.getEmail();
+            System.out.println(msg);
+            throw new ApiRequestException(msg);
         }
         System.out.println("Saving New User");
         String id=getUserId(user);
         user.set_id(id);
-        user.setRole(Role.USER);
+        user.setRole(Person.Role.USER);
         return userRepository.save(user);
     }
     public User updateUser(User user){
         System.out.println("user to update - "+user.getPhoneNumber());
         if(findUserByPhoneNumber(user.getPhoneNumber())==null)
         {
-            System.out.println("User not found - "+user.getPhoneNumber());
-            throw new UsernameNotFoundException("User not exist");
+            String msg="User not found - "+user.getPhoneNumber();
+            System.out.println(msg);
+            throw new ApiRequestException(msg);
         }
         System.out.println("Updating User");
         String id=getUserId(user);
         user.set_id(id);
-        user.setRole(Role.USER);
+        user.setRole(Person.Role.USER);
         return userRepository.save(user);
     }
     private String getUserId(User user) {

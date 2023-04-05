@@ -1,7 +1,7 @@
 package com.indra.bookMyAppointment.auth;
 
 import com.indra.bookMyAppointment.config.JwtService;
-import com.indra.bookMyAppointment.model.user.Role;
+import com.indra.bookMyAppointment.model.common.Person;
 import com.indra.bookMyAppointment.model.user.User;
 import com.indra.bookMyAppointment.repository.UserRepository;
 import com.indra.bookMyAppointment.service.UserService;
@@ -30,7 +30,7 @@ public class AuthenticationService {
     user.setEmail(request.getEmail());
     user.setPhoneNumber(request.getPhoneNumber());
     user.setPassword(passwordEncoder.encode(request.getPassword()));
-    user.setRole(Role.USER);
+    user.setRole(Person.Role.USER);
     var savedUser = service.saveNewUser(user);
     var jwtToken = jwtService.generateToken(user);
     saveUserToken(savedUser, jwtToken);
