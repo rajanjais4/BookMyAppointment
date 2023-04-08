@@ -1,5 +1,6 @@
 package com.indra.bookMyAppointment.token;
 
+import com.indra.bookMyAppointment.model.common.Person;
 import com.indra.bookMyAppointment.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,5 +26,5 @@ public class Token {
   public boolean revoked;
 
   public boolean expired;
-  public User user;
+  public Person user;
 }

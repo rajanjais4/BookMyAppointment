@@ -1,6 +1,6 @@
 package com.indra.bookMyAppointment.config;
 
-import com.indra.bookMyAppointment.repository.UserRepository;
+import com.indra.bookMyAppointment.repository.PersonRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class ApplicationConfig {
 
-  private final UserRepository repository;
+  private final PersonRepository repository;
 
   @Bean
   public UserDetailsService userDetailsService() {

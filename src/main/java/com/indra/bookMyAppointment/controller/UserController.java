@@ -1,16 +1,18 @@
 package com.indra.bookMyAppointment.controller;
 
-import com.indra.bookMyAppointment.auth.AuthenticationResponse;
 import com.indra.bookMyAppointment.config.JwtService;
 import com.indra.bookMyAppointment.exception.ApiRequestException;
+import com.indra.bookMyAppointment.model.common.Person;
+import com.indra.bookMyAppointment.model.common.Role;
 import com.indra.bookMyAppointment.model.user.User;
-import com.indra.bookMyAppointment.service.UserService;
+import com.indra.bookMyAppointment.service.personService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
@@ -20,7 +22,7 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    UserService userService;
+    personService personService;
     @Autowired
     JwtService jwtService;
 
@@ -30,41 +32,43 @@ public class UserController {
     public void redirect(HttpServletResponse response) throws IOException {
         response.sendRedirect("/swagger-ui.html");
     }
+
+    @RolesAllowed("ADMINS")
     @GetMapping("/getAllUsers")
-    public ResponseEntity<List<User>> getAllUsers()
+    public ResponseEntity<List<Person>> getAllUsers()
     {
-        return ResponseEntity.ok(userService.findAll());
+        return ResponseEntity.ok(personService.findAll());
     }
 
     @GetMapping("/getUserByPhoneNumber")
-    public ResponseEntity<User> getUsersByPhoneNumber(@RequestParam("phoneNumber")String phoneNumber,
+    public ResponseEntity<Person> getUsersByPhoneNumber(@RequestParam("phoneNumber")String phoneNumber,
                                                       @RequestHeader (name="Authorization") String token)
     {
         String userAuthPhoneNumber=getUserPhoneNumberByToken(token);
         if(!phoneNumber.equals(userAuthPhoneNumber))
             throw new ApiRequestException("user- "+userAuthPhoneNumber+" querying for another user");
-        User user=userService.findUserByPhoneNumber(phoneNumber);
+        Person user= personService.findUserByPhoneNumber(phoneNumber);
         if(user==null)
             throw new ApiRequestException("User not found");
         return ResponseEntity.ok(user);
     }
     @GetMapping("/getUserByAuthToken")
-    public ResponseEntity<User> getUsersByAuth(@RequestHeader (name="Authorization") String token)
+    public ResponseEntity<Person> getUsersByAuth(@RequestHeader (name="Authorization") String token)
     {
         String userAuthPhoneNumber=getUserPhoneNumberByToken(token);
-        User user=userService.findUserByPhoneNumber(userAuthPhoneNumber);
+        Person user= personService.findUserByPhoneNumber(userAuthPhoneNumber);
         if(user==null)
             throw new ApiRequestException("User not found");
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/updateUser")
-    public ResponseEntity<User> updateUser(@RequestBody User user,
+    public ResponseEntity<Person> updateUser(@RequestBody Person user,
                                            @RequestHeader (name="Authorization") String token){
         String userAuthPhoneNumber=getUserPhoneNumberByToken(token);
         if(user.getPhoneNumber()!=userAuthPhoneNumber)
             throw new ApiRequestException("user- "+userAuthPhoneNumber+" trying to update details of another user");
-        User userResponse =userService.updateUser(user);
+        Person userResponse = personService.updateUser(user);
         if(user==null)
             throw new ApiRequestException("User not updated");
         return ResponseEntity.ok(userResponse);
