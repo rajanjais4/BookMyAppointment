@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
+@Document(collection = "person")
 @NoArgsConstructor
 public class User extends Person {
 

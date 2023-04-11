@@ -14,6 +14,11 @@ public class ApiExceptionHandler {
         ApiException apiException=createAPiException(ex.getMessage(),HttpStatus.BAD_REQUEST,ZonedDateTime.now());
         return new ResponseEntity<>(apiException,HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler( value={Exception.class})
+    public ResponseEntity<Object> handleGenericException(Exception ex){
+        ApiException apiException=createAPiException(ex.getMessage(),HttpStatus.BAD_REQUEST,ZonedDateTime.now());
+        return new ResponseEntity<>(apiException,HttpStatus.BAD_REQUEST);
+    }
 
     private ApiException createAPiException(String msg, HttpStatus httpStatus, ZonedDateTime time) {
         ApiException apiException=new ApiException(
@@ -23,4 +28,5 @@ public class ApiExceptionHandler {
         );
         return apiException;
     }
+
 }

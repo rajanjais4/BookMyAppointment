@@ -1,14 +1,14 @@
 package com.indra.bookMyAppointment.controller;
 
-import com.indra.bookMyAppointment.config.JwtService;
+import com.indra.bookMyAppointment.common.Common;
 import com.indra.bookMyAppointment.exception.ApiRequestException;
 import com.indra.bookMyAppointment.model.common.Person;
 import com.indra.bookMyAppointment.model.common.Role;
+import com.indra.bookMyAppointment.model.professional.Professional;
 import com.indra.bookMyAppointment.model.user.User;
-import com.indra.bookMyAppointment.service.personService;
+import com.indra.bookMyAppointment.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -18,13 +18,14 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
-public class UserController {
+@RequestMapping("/person")
+public class PersonController {
 
     @Autowired
-    personService personService;
+    PersonService personService;
+
     @Autowired
-    JwtService jwtService;
+    Common common;
 
 
     @ApiIgnore
@@ -34,17 +35,17 @@ public class UserController {
     }
 
     @RolesAllowed("ADMINS")
-    @GetMapping("/getAllUsers")
-    public ResponseEntity<List<Person>> getAllUsers()
+    @GetMapping("/getAllPersons")
+    public ResponseEntity<List<Person>> getAllPerson()
     {
         return ResponseEntity.ok(personService.findAll());
     }
 
-    @GetMapping("/getUserByPhoneNumber")
-    public ResponseEntity<Person> getUsersByPhoneNumber(@RequestParam("phoneNumber")String phoneNumber,
+    @GetMapping("/getPersonByPhoneNumber")
+    public ResponseEntity<Person> getPersonByPhoneNumber(@RequestParam("phoneNumber")String phoneNumber,
                                                       @RequestHeader (name="Authorization") String token)
     {
-        String userAuthPhoneNumber=getUserPhoneNumberByToken(token);
+        String userAuthPhoneNumber= common.getPersonPhoneNumberByToken(token);
         if(!phoneNumber.equals(userAuthPhoneNumber))
             throw new ApiRequestException("user- "+userAuthPhoneNumber+" querying for another user");
         Person user= personService.findUserByPhoneNumber(phoneNumber);
@@ -52,33 +53,35 @@ public class UserController {
             throw new ApiRequestException("User not found");
         return ResponseEntity.ok(user);
     }
-    @GetMapping("/getUserByAuthToken")
+    @GetMapping("/getPersonByAuthToken")
     public ResponseEntity<Person> getUsersByAuth(@RequestHeader (name="Authorization") String token)
     {
-        String userAuthPhoneNumber=getUserPhoneNumberByToken(token);
+        String userAuthPhoneNumber= common.getPersonPhoneNumberByToken(token);
         Person user= personService.findUserByPhoneNumber(userAuthPhoneNumber);
         if(user==null)
             throw new ApiRequestException("User not found");
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/updateUser")
-    public ResponseEntity<Person> updateUser(@RequestBody Person user,
-                                           @RequestHeader (name="Authorization") String token){
-        String userAuthPhoneNumber=getUserPhoneNumberByToken(token);
-        if(user.getPhoneNumber()!=userAuthPhoneNumber)
-            throw new ApiRequestException("user- "+userAuthPhoneNumber+" trying to update details of another user");
-        Person userResponse = personService.updateUser(user);
-        if(user==null)
-            throw new ApiRequestException("User not updated");
+    @PostMapping("/updateProfessional")
+    public ResponseEntity<Person> updateProfessional(@RequestBody Professional professional,
+                                                   @RequestHeader(name="Authorization") String token){
+        common.personUpdateRequestCheck(professional,token,Role.PROFESSIONAL);
+        Person person=common.createUpdatedProfessional(professional);
+        Person userResponse = personService.updatePerson(person);
+        if(userResponse==null)
+            throw new ApiRequestException("professional not updated");
         return ResponseEntity.ok(userResponse);
     }
-    private String getUserPhoneNumberByToken(String token) {
-        System.out.println("token- "+token);
-        String jwt=token.substring(7);;
-        String userNumber= jwtService.extractUsername(jwt);
-        System.out.println("userNumber- "+userNumber);
-        return userNumber;
+    @PostMapping("/updateUser")
+    public ResponseEntity<Person> updateUser(@RequestBody User user,
+                                             @RequestHeader(name="Authorization") String token){
+        common.personUpdateRequestCheck(user,token,Role.USER);
+        Person person=common.createUpdatedUser(user);;
+        Person userResponse = personService.updatePerson(person);
+        if(person==null)
+            throw new ApiRequestException("User not updated");
+        return ResponseEntity.ok(userResponse);
     }
 
 }

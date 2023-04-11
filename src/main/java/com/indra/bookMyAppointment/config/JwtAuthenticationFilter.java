@@ -27,6 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final UserDetailsService userDetailsService;
   private final TokenRepository tokenRepository;
 
+//  this filter is first thing that executed when a request received
   @Override
   protected void doFilterInternal(
       @NonNull HttpServletRequest request,
@@ -42,6 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       return;
     }
     jwt = authHeader.substring(7);
+    System.out.println(jwt);
     personNumber = jwtService.extractUsername(jwt);
     System.out.println("JwtAuthenticationFilter.doFilterInternal.personNumber - "+personNumber);
     if (personNumber != null && SecurityContextHolder.getContext().getAuthentication() == null) {

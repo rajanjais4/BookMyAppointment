@@ -1,5 +1,6 @@
 package com.indra.bookMyAppointment.config;
 
+import com.indra.bookMyAppointment.model.common.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -26,14 +27,21 @@ public class JwtService {
   public String extractUsername(String token) {
     return extractClaim(token, Claims::getSubject);
   }
+  public Role extractRole(String token) {
+    final Claims claims = extractAllClaims(token);
+    Role role = Role.valueOf(claims.get("role").toString());
+    return role;
+  }
 
   public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
     final Claims claims = extractAllClaims(token);
     return claimsResolver.apply(claims);
   }
 
-  public String generateToken(UserDetails userDetails) {
-    return generateToken(new HashMap<>(), userDetails);
+  public String generateToken(Role role,UserDetails userDetails) {
+    HashMap<String, Object> extraClaim = new HashMap<>();
+    extraClaim.put("role", role.name());
+    return generateToken(extraClaim, userDetails);
   }
 
   public String generateToken(

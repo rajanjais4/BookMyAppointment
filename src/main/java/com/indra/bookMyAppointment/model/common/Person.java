@@ -1,8 +1,10 @@
 package com.indra.bookMyAppointment.model.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +15,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Document(collection = "person")
 public class Person implements UserDetails {
     @Id
     private String _id;
@@ -25,11 +28,13 @@ public class Person implements UserDetails {
     @NonNull
     private String phoneNumber;
     @NonNull
+    @JsonIgnore
     private String password;
     private List<Address> address;
     private Role role;
 
     //    @Enumerated(EnumType.STRING)
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(Role.ADMIN.name()),
@@ -37,26 +42,27 @@ public class Person implements UserDetails {
                 new SimpleGrantedAuthority(Role.USER.name()));
     }
 
+    @JsonIgnore
     @Override
     public String getUsername() {
         return getPhoneNumber();
     }
-
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
-
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
-
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
-
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;

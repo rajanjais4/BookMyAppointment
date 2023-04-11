@@ -7,7 +7,7 @@ import com.indra.bookMyAppointment.model.common.Role;
 import com.indra.bookMyAppointment.model.professional.Professional;
 import com.indra.bookMyAppointment.model.user.User;
 import com.indra.bookMyAppointment.repository.PersonRepository;
-import com.indra.bookMyAppointment.service.personService;
+import com.indra.bookMyAppointment.service.PersonService;
 import com.indra.bookMyAppointment.token.Token;
 import com.indra.bookMyAppointment.token.TokenRepository;
 import com.indra.bookMyAppointment.token.TokenType;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-  private final personService service;
+  private final PersonService service;
   private final PersonRepository repository;
   private final TokenRepository tokenRepository;
   private final PasswordEncoder passwordEncoder;
@@ -45,7 +45,7 @@ public class AuthenticationService {
     person.setPassword(passwordEncoder.encode(request.getPassword()));
     person.setRole(request.getRole());
     var savedUser = service.saveNewUser(person);
-    var jwtToken = jwtService.generateToken(person);
+    var jwtToken = jwtService.generateToken(person.getRole(),person);
     saveUserToken(savedUser, jwtToken);
     return AuthenticationResponse.builder()
         .token(jwtToken)
@@ -60,12 +60,12 @@ public class AuthenticationService {
         )
     );
     System.out.println("AuthenticationService.authenticate.request.getPhoneNumber() - "+request.getPhoneNumber());
-    var user = repository.findByPhoneNumber(request.getPhoneNumber())
+    var person = repository.findByPhoneNumber(request.getPhoneNumber())
         .orElseThrow();
-    var jwtToken = jwtService.generateToken(user);
+    var jwtToken = jwtService.generateToken(person.getRole(),person);
     System.out.println("AuthenticationService.authenticate.jwtToken - "+jwtToken);
-    revokeAllUserTokens(user);
-    saveUserToken(user, jwtToken);
+    revokeAllUserTokens(person);
+    saveUserToken(person, jwtToken);
     return AuthenticationResponse.builder()
         .token(jwtToken)
         .build();
