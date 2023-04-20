@@ -23,11 +23,12 @@ public class SecurityConfiguration {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    String permittedString="/auth/**";
     http
         .csrf()
         .disable()
         .authorizeRequests()
-        .antMatchers("/api/v1/auth/**")
+        .antMatchers(permittedString)
           .permitAll()
         .anyRequest()
           .authenticated()
@@ -38,7 +39,7 @@ public class SecurityConfiguration {
         .authenticationProvider(authenticationProvider)
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
         .logout()
-        .logoutUrl("/api/v1/auth/logout")
+        .logoutUrl("/auth/logout")
         .addLogoutHandler(logoutHandler)
         .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
     ;

@@ -27,13 +27,6 @@ public class PersonController {
     @Autowired
     Common common;
 
-
-    @ApiIgnore
-    @RequestMapping(value="/")
-    public void redirect(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/swagger-ui.html");
-    }
-
     @RolesAllowed("ADMINS")
     @GetMapping("/getAllPersons")
     public ResponseEntity<List<Person>> getAllPerson()

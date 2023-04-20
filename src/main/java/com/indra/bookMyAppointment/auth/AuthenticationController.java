@@ -12,13 +12,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
 
+  @ApiIgnore
   @RequestMapping(value="/")
   public void redirect(HttpServletResponse response) throws IOException {
+
     response.sendRedirect("/swagger-ui.html");
   }
   private final AuthenticationService service;
