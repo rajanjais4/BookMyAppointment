@@ -6,8 +6,11 @@ import com.indra.bookMyAppointment.model.common.Person;
 import com.indra.bookMyAppointment.model.common.Role;
 import com.indra.bookMyAppointment.model.professional.Professional;
 import com.indra.bookMyAppointment.repository.PersonRepository;
+import com.indra.bookMyAppointment.repository.ProfessionalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +20,8 @@ public class PersonService {
     PersonRepository personRepository;
     @Autowired
     Common common;
+    @Autowired
+    ProfessionalRepository professionalRepository;
     public List<Person> findAll()
     {
         List<Person> personList= personRepository.findAll();
@@ -49,21 +54,7 @@ public class PersonService {
             throw new ApiRequestException(msg);
         }
         System.out.println("Saving New User");
-        String id=getUserId(person);
-        person.set_id(id);
-        return personRepository.save(person);
-    }
-    public Person updateUser(Person person){
-        System.out.println("user to update - "+person.getPhoneNumber());
-        Person person1=findUserByPhoneNumber(person.getPhoneNumber());
-        if(person==null)
-        {
-            String msg="User not found - "+person.getPhoneNumber();
-            System.out.println(msg);
-            throw new ApiRequestException(msg);
-        }
-        System.out.println("Updating User");
-        String id=getUserId(person);
+        String id=common.createPersonId(person);
         person.set_id(id);
         return personRepository.save(person);
     }
@@ -71,13 +62,7 @@ public class PersonService {
 
         return personRepository.save(person);
     }
-    private String getUserId(Person person) {
-        Role role=person.getRole();
-        if(role==Role.USER)
-            return "U_"+person.getPhoneNumber();
-        else if(role==Role.PROFESSIONAL)
-            return "P_"+person.getPhoneNumber();
-        else
-            return "O_"+person.getPhoneNumber();
+    public List<Person> searchProfessional(String name){
+        return professionalRepository.searchProfessional(name);
     }
 }

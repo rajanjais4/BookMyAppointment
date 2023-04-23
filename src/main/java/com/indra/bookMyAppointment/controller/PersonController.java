@@ -9,6 +9,7 @@ import com.indra.bookMyAppointment.model.user.User;
 import com.indra.bookMyAppointment.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -27,6 +28,7 @@ public class PersonController {
     @Autowired
     Common common;
 
+//    TODO: implement admin
     @RolesAllowed("ADMINS")
     @GetMapping("/getAllPersons")
     public ResponseEntity<List<Person>> getAllPerson()
@@ -47,7 +49,7 @@ public class PersonController {
         return ResponseEntity.ok(user);
     }
     @GetMapping("/getPersonByAuthToken")
-    public ResponseEntity<Person> getUsersByAuth(@RequestHeader (name="Authorization") String token)
+    public ResponseEntity<Person> getPersonByAuth(@RequestHeader (name="Authorization") String token)
     {
         String userAuthPhoneNumber= common.getPersonPhoneNumberByToken(token);
         Person user= personService.findUserByPhoneNumber(userAuthPhoneNumber);
@@ -65,6 +67,12 @@ public class PersonController {
         if(userResponse==null)
             throw new ApiRequestException("professional not updated");
         return ResponseEntity.ok(userResponse);
+    }
+    @GetMapping("/searchProfessional")
+    public ResponseEntity<List<Person>> searchProfessional(@RequestHeader(name="name",required = false) String name,
+                                                     @RequestHeader(name="Authorization") String token){
+        List<Person>professionalList=personService.searchProfessional(name);
+        return ResponseEntity.ok(professionalList);
     }
     @PostMapping("/updateUser")
     public ResponseEntity<Person> updateUser(@RequestBody User user,

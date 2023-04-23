@@ -10,4 +10,8 @@ public interface PersonRepository extends MongoRepository<Person,String> {
     Optional<Person> findByPhoneNumber(String phoneNumber);
 
     Optional<Person> findByEmail(String email);
+
+//    TODO:move Professional search in separate repo
+
+
 }

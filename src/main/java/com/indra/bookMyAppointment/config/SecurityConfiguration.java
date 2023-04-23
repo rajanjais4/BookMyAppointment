@@ -23,8 +23,8 @@ public class SecurityConfiguration {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    String permittedString="/auth/**";
-    final String[] AUTH_WHITELIST = {
+    String Auth_WHITELIST="/auth/**";
+    final String[] SWAGGER_WHITELIST = {
 
             // for Swagger UI v2
             "/v2/api-docs",
@@ -43,9 +43,9 @@ public class SecurityConfiguration {
         .csrf()
         .disable()
         .authorizeRequests()
-        .antMatchers(permittedString)
+        .antMatchers(Auth_WHITELIST)
           .permitAll()
-            .antMatchers(AUTH_WHITELIST).permitAll()
+            .antMatchers(SWAGGER_WHITELIST).permitAll()
         .anyRequest()
           .authenticated()
         .and()

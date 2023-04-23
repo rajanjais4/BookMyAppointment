@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,20 +21,26 @@ public class Person implements UserDetails {
     @Id
     private String _id;
     @NonNull
+    @Indexed()
     private String name;
-    @Indexed(unique = true)
     @NonNull
     private String email;
-    @Indexed(unique = true)
+    @Indexed()
     @NonNull
     private String phoneNumber;
     @NonNull
     @JsonIgnore
     private String password;
+    @Indexed()
     private List<Address> address;
+    @NonNull
+    @Indexed()
     private Role role;
 
-    //    @Enumerated(EnumType.STRING)
+
+
+
+    //    Spring security
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -41,7 +48,6 @@ public class Person implements UserDetails {
                 new SimpleGrantedAuthority(Role.PROFESSIONAL.name()),
                 new SimpleGrantedAuthority(Role.USER.name()));
     }
-
     @JsonIgnore
     @Override
     public String getUsername() {

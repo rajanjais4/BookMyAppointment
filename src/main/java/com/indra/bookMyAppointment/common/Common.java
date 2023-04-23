@@ -64,7 +64,7 @@ public class Common {
         }
         return updatedProfessional;
     }
-
+// Check and confirm that right persion with right role updating its profile
     public void personUpdateRequestCheck(Person person, String token, Role role) {
         if(person.getPhoneNumber()==null)
             throw new ApiRequestException("phone number not provided not found - ");
@@ -78,5 +78,14 @@ public class Common {
             throw new ApiRequestException("Person role in auth-token and role provided are not matching");
         if(personRepository.findByPhoneNumber(person.getPhoneNumber()).orElse(null)==null)
             throw new ApiRequestException("Person not found - "+person.getPhoneNumber());
+    }
+    public String createPersonId(Person person) {
+        Role role=person.getRole();
+        if(role==Role.USER)
+            return "U_"+person.getPhoneNumber();
+        else if(role==Role.PROFESSIONAL)
+            return "P_"+person.getPhoneNumber();
+        else
+            return "A_"+person.getPhoneNumber();
     }
 }
